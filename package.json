@@ -2,7 +2,7 @@
   "name": "nestica",
   "displayName": "Nestica",
   "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "SerhiiPimenov",
   "license": "MIT",
   "repository": {
@@ -15,8 +15,13 @@
   "categories": [
     "Programming Languages"
   ],
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#0F172A",
+    "theme": "dark"
+  },
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage"
   ],
   "main": "./dist/index.js",
   "contributes": {

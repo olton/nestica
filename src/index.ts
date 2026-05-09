@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 
 const DEFAULT_BRACKET_COLORS = ['#E06C75', '#E5C07B', '#98C379', '#56B6C2', '#61AFEF', '#C678DD'];
 
-const CONFIG_SECTION = 'rainbow';
-const CONFIG_BRACKETS_ENABLED_KEY = 'rainbow.brackets.enabled';
+const CONFIG_SECTION = 'nestica';
+const CONFIG_BRACKETS_ENABLED_KEY = 'nestica.brackets.enabled';
 const CONFIG_COLORS_KEY = 'colors';
 const CONFIG_GUIDES_ENABLED_KEY = 'guides.enabled';
 const CONFIG_GUIDES_THICKNESS_KEY = 'guides.thickness';
@@ -202,6 +202,14 @@ function createGuideDecorationTypes(colors: string[], guideSettings: GuideSettin
     );
 }
 
+function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number): boolean {
+    const bracePos = document.positionAt(braceIndex);
+    const linePrefix = document.lineAt(bracePos.line).text.slice(0, bracePos.character);
+
+    // Cases like: "): type {", ") => {", "): type => {".
+    return /\)\s*(?:(?::[^{}()]*)\s*(?:=>)?|=>)\s*$/.test(linePrefix);
+}
+
 function collectBracketRanges(document: vscode.TextDocument, colorCount: number, tabSize: number): CollectedDecorations {
     const bracketRangesByColor = Array.from({ length: colorCount }, () => [] as vscode.Range[]);
     const guideRangesByColor = Array.from({ length: colorCount }, () => [] as vscode.Range[]);
@@ -212,23 +220,11 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
         const ch = text[i];
 
         if (OPEN_TO_CLOSE[ch]) {
-            if (ch === '{') {
-                const colorIndex = stack.length % colorCount;
-                let rightPartIndex = i - 1;
+            const level = ch === '{' && shouldOffsetCurlyBraceLevel(document, i)
+                ? stack.length + 1
+                : stack.length;
 
-                while (rightPartIndex >= 0 && /\s/.test(text[rightPartIndex])) {
-                    rightPartIndex -= 1;
-                }
-
-                const leftPartIndex = rightPartIndex - 1;
-                if (rightPartIndex >= 0 && leftPartIndex >= 0 && text[rightPartIndex] === '>' && text[leftPartIndex] === '=') {
-                    const arrowStart = document.positionAt(leftPartIndex);
-                    const arrowEnd = document.positionAt(rightPartIndex + 1);
-                    bracketRangesByColor[colorIndex].push(new vscode.Range(arrowStart, arrowEnd));
-                }
-            }
-
-            stack.push({ char: ch, index: i, level: stack.length });
+            stack.push({ char: ch, index: i, level });
             continue;
         }
 
@@ -293,21 +289,21 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
     return { bracketRangesByColor, guideRangesByColor };
 }
 
-function clearRainbowDecorations(editor: vscode.TextEditor, decorationSets: DecorationSets): void {
+function clearNesticaDecorations(editor: vscode.TextEditor, decorationSets: DecorationSets): void {
     for (let i = 0; i < decorationSets.brackets.length; i += 1) {
         editor.setDecorations(decorationSets.brackets[i], []);
         editor.setDecorations(decorationSets.guides[i], []);
     }
 }
 
-function applyRainbowDecorations(
+function applyNesticaDecorations(
     editor: vscode.TextEditor,
     decorationSets: DecorationSets,
     guideSettings: GuideSettings,
     colorizationEnabled: boolean,
 ): void {
     if (!colorizationEnabled) {
-        clearRainbowDecorations(editor, decorationSets);
+        clearNesticaDecorations(editor, decorationSets);
         return;
     }
 
@@ -335,7 +331,7 @@ function scheduleRefresh(
 
     const timer = setTimeout(() => {
         updateTimers.delete(key);
-        applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
+        applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
     }, 60);
 
     updateTimers.set(key, timer);
@@ -371,7 +367,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
-        applyRainbowDecorations(activeEditor, decorationSets, guideSettings, colorizationEnabled);
+        applyNesticaDecorations(activeEditor, decorationSets, guideSettings, colorizationEnabled);
     }
 
     context.subscriptions.push(
@@ -414,14 +410,14 @@ export function activate(context: vscode.ExtensionContext): void {
             }
 
             for (const editor of vscode.window.visibleTextEditors) {
-                applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
+                applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
         
-        vscode.commands.registerCommand('rainbow.refresh', () => {
+        vscode.commands.registerCommand('nestica.refresh', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
-                applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
+                applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
         {

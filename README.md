@@ -1,6 +1,6 @@
-# Rainbow Brackets
+# Nestica
 
-Rainbow Brackets is a Visual Studio Code extension that colors nested bracket pairs for better readability.
+Nestica is a Visual Studio Code extension that colors nested bracket pairs for better readability.
 
 - Supported bracket types: `()`, `{}`, `[]`, `<>`
 - Supported file types: Any files with these brackets (e.g. JavaScript, Python, C++, etc.)
@@ -14,10 +14,11 @@ Rainbow Brackets is a Visual Studio Code extension that colors nested bracket pa
 
 ## Development Setup
 
-1. Install dependencies:
+1. Install:
 
 	```bash
-	npm install @olton/rainbow
+	git clone https://github.com/olton/nestica.git
+	cd nestica
 	```
 
 2. Build extension sources:
@@ -28,18 +29,26 @@ Rainbow Brackets is a Visual Studio Code extension that colors nested bracket pa
 
 3. Open this project in VS Code and press `F5` to start the Extension Development Host.
 
+## Installation
+
+You can install Nestica from the Visual Studio Code Marketplace: [Nestica](https://marketplace.visualstudio.com/items?itemName=SerhiiPimenov.nestica)
+
+or 
+
+Open the Extensions view in VS Code, search for "Nestica", and click "Install".
+
 ## Usage
 
-Rainbow runs automatically after activation. You can also manually refresh bracket decorations with:
+Nestica runs automatically after activation. You can also manually refresh bracket decorations with:
 
-- `Rainbow: Refresh` command from the Command Palette.
+- `Nestica: Refresh` command from the Command Palette.
 
 You can customize colors in your VS Code settings:
 
 ```json
 {
-	"rainbow.brackets.enabled": true,
-	"rainbow.colors": [
+	"nestica.brackets.enabled": true,
+	"nestica.colors": [
 		"#FF6B6B",
 		"#FFD166",
 		"#06D6A0",
@@ -47,11 +56,16 @@ You can customize colors in your VS Code settings:
 		"#4895EF",
 		"#B5179E"
 	],
-	"rainbow.guides.enabled": true,
-	"rainbow.guides.thickness": 1,
-	"rainbow.guides.opacity": 1
+	"nestica.guides.enabled": true,
+	"nestica.guides.thickness": 1,
+	"nestica.guides.opacity": 1
 }
 ```
+
+## Screenshots
+
+![Nestica bracket highlighting](images/screenshot-1.png)
+![Nestica settings](images/screenshot-2.png)
 
 ## Contributing
 
