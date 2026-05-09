@@ -146,6 +146,33 @@ function getGuideSettings(): GuideSettings {
     };
 }
 
+function colorWithOpacity(color: string, opacity: number): string {
+    const normalized = color.trim();
+
+    const hex3 = /^#([\da-fA-F]{3})$/;
+    const hex6 = /^#([\da-fA-F]{6})$/;
+
+    const hex3Match = normalized.match(hex3);
+    if (hex3Match) {
+        const [r, g, b] = hex3Match[1].split('');
+        const rr = parseInt(r + r, 16);
+        const gg = parseInt(g + g, 16);
+        const bb = parseInt(b + b, 16);
+        return `rgba(${rr}, ${gg}, ${bb}, ${opacity})`;
+    }
+
+    const hex6Match = normalized.match(hex6);
+    if (hex6Match) {
+        const hex = hex6Match[1];
+        const rr = parseInt(hex.slice(0, 2), 16);
+        const gg = parseInt(hex.slice(2, 4), 16);
+        const bb = parseInt(hex.slice(4, 6), 16);
+        return `rgba(${rr}, ${gg}, ${bb}, ${opacity})`;
+    }
+
+    return normalized;
+}
+
 function createBracketDecorationTypes(colors: string[]): vscode.TextEditorDecorationType[] {
     return colors.map((color) =>
         vscode.window.createTextEditorDecorationType({
@@ -166,10 +193,9 @@ function createGuideDecorationTypes(colors: string[], guideSettings: GuideSettin
 
     return colors.map((color) =>
         vscode.window.createTextEditorDecorationType({
-            borderColor: color,
+            borderColor: colorWithOpacity(color, guideSettings.opacity),
             borderStyle: 'solid',
             borderWidth: `0 0 0 ${guideSettings.thickness}px`,
-            opacity: guideSettings.opacity.toString(),
             rangeBehavior: vscode.DecorationRangeBehavior.OpenOpen,
             // isWholeLine: не використовуємо!
         }),
@@ -391,6 +417,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
+        
         vscode.commands.registerCommand('rainbow.refresh', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
