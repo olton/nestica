@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 const DEFAULT_BRACKET_COLORS = ['#E06C75', '#E5C07B', '#98C379', '#56B6C2', '#61AFEF', '#C678DD'];
 
-const CONFIG_SECTION = 'rainbowBrackets';
+const CONFIG_SECTION = 'rainbow';
 const CONFIG_BRACKETS_ENABLED_KEY = 'rainbow.brackets.enabled';
 const CONFIG_COLORS_KEY = 'colors';
 const CONFIG_GUIDES_ENABLED_KEY = 'guides.enabled';
@@ -391,7 +391,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
-        vscode.commands.registerCommand('rainbowBrackets.refresh', () => {
+        vscode.commands.registerCommand('rainbow.refresh', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
                 applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);

@@ -1,10 +1,14 @@
 {
-  "name": "@olton/rainbow",
+  "name": "rainbow",
   "displayName": "Rainbow",
   "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
   "version": "0.1.0",
-  "publisher": "Serhii Pimenov",
+  "publisher": "SerhiiPimenov",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olton/rainbow.git"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
