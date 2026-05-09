@@ -2,11 +2,9 @@
 
 Rainbow Brackets is a Visual Studio Code extension that colors nested bracket pairs for better readability.
 
-Supported bracket types:
-
-- `()`
-- `{}`
-- `[]`
+- Supported bracket types: `()`, `{}`, `[]`, `<>`
+- Supported file types: Any files with these brackets (e.g. JavaScript, Python, C++, etc.)
+- Customizable colors and guide lines
 
 ## Features
 
@@ -19,7 +17,7 @@ Supported bracket types:
 1. Install dependencies:
 
 	```bash
-	npm install
+	npm install @olton/rainbow
 	```
 
 2. Build extension sources:
@@ -32,15 +30,16 @@ Supported bracket types:
 
 ## Usage
 
-Rainbow Brackets runs automatically after activation. You can also manually refresh bracket decorations with:
+Rainbow runs automatically after activation. You can also manually refresh bracket decorations with:
 
-- `Rainbow Brackets: Refresh` command from the Command Palette.
+- `Rainbow: Refresh` command from the Command Palette.
 
 You can customize colors in your VS Code settings:
 
 ```json
 {
-	"rainbowBrackets.colors": [
+	"rainbow.brackets.enabled": true,
+	"rainbow.colors": [
 		"#FF6B6B",
 		"#FFD166",
 		"#06D6A0",
@@ -48,12 +47,26 @@ You can customize colors in your VS Code settings:
 		"#4895EF",
 		"#B5179E"
 	],
-	"rainbowBrackets.guides.enabled": true,
-	"rainbowBrackets.guides.thickness": 1,
-	"rainbowBrackets.guides.opacity": 1
+	"rainbow.guides.enabled": true,
+	"rainbow.guides.thickness": 1,
+	"rainbow.guides.opacity": 1
 }
 ```
 
 ## Contributing
 
 Contributions are welcome. Feel free to submit a pull request or open an issue.
+
+## Support
+
+If you like this project, please consider supporting it by:
+
++ Star this repository on GitHub
++ Sponsor this project on GitHub Sponsors
++ **PayPal** to `serhii@pimenov.com.ua`.
++ [**Patreon**](https://www.patreon.com/metroui)
++ [**Buy me a coffee**](https://buymeacoffee.com/pimenov)
+
+---
+
+Copyright (c) 2026 by [Serhii Pimenov](https://pimenov.com.ua). All Rights Reserved.

@@ -12,7 +12,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLoaded"
+    "onStartupFinished"
   ],
   "main": "./dist/index.js",
   "contributes": {
@@ -25,6 +25,11 @@
     "configuration": {
       "title": "Rainbow",
       "properties": {
+        "rainbow.brackets.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable rainbow bracket colorization."
+        },
         "rainbow.colors": {
           "type": "array",
           "default": [

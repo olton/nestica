@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 const DEFAULT_BRACKET_COLORS = ['#E06C75', '#E5C07B', '#98C379', '#56B6C2', '#61AFEF', '#C678DD'];
 
 const CONFIG_SECTION = 'rainbowBrackets';
+const CONFIG_BRACKETS_ENABLED_KEY = 'rainbow.brackets.enabled';
 const CONFIG_COLORS_KEY = 'colors';
 const CONFIG_GUIDES_ENABLED_KEY = 'guides.enabled';
 const CONFIG_GUIDES_THICKNESS_KEY = 'guides.thickness';
@@ -111,6 +112,11 @@ function getConfiguredColors(): string[] {
     return normalized.length > 0 ? normalized : DEFAULT_BRACKET_COLORS;
 }
 
+function isColorizationEnabled(): boolean {
+    const config = vscode.workspace.getConfiguration();
+    return config.get<boolean>(CONFIG_BRACKETS_ENABLED_KEY, true);
+}
+
 function normalizeGuideThickness(value: unknown): number {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         return 1;
@@ -180,6 +186,22 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
         const ch = text[i];
 
         if (OPEN_TO_CLOSE[ch]) {
+            if (ch === '{') {
+                const colorIndex = stack.length % colorCount;
+                let rightPartIndex = i - 1;
+
+                while (rightPartIndex >= 0 && /\s/.test(text[rightPartIndex])) {
+                    rightPartIndex -= 1;
+                }
+
+                const leftPartIndex = rightPartIndex - 1;
+                if (rightPartIndex >= 0 && leftPartIndex >= 0 && text[rightPartIndex] === '>' && text[leftPartIndex] === '=') {
+                    const arrowStart = document.positionAt(leftPartIndex);
+                    const arrowEnd = document.positionAt(rightPartIndex + 1);
+                    bracketRangesByColor[colorIndex].push(new vscode.Range(arrowStart, arrowEnd));
+                }
+            }
+
             stack.push({ char: ch, index: i, level: stack.length });
             continue;
         }
@@ -245,7 +267,24 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
     return { bracketRangesByColor, guideRangesByColor };
 }
 
-function applyRainbowDecorations(editor: vscode.TextEditor, decorationSets: DecorationSets, guideSettings: GuideSettings): void {
+function clearRainbowDecorations(editor: vscode.TextEditor, decorationSets: DecorationSets): void {
+    for (let i = 0; i < decorationSets.brackets.length; i += 1) {
+        editor.setDecorations(decorationSets.brackets[i], []);
+        editor.setDecorations(decorationSets.guides[i], []);
+    }
+}
+
+function applyRainbowDecorations(
+    editor: vscode.TextEditor,
+    decorationSets: DecorationSets,
+    guideSettings: GuideSettings,
+    colorizationEnabled: boolean,
+): void {
+    if (!colorizationEnabled) {
+        clearRainbowDecorations(editor, decorationSets);
+        return;
+    }
+
     const tabSize = normalizeTabSize(editor.options.tabSize);
     const { bracketRangesByColor, guideRangesByColor } = collectBracketRanges(editor.document, decorationSets.brackets.length, tabSize);
 
@@ -255,7 +294,12 @@ function applyRainbowDecorations(editor: vscode.TextEditor, decorationSets: Deco
     }
 }
 
-function scheduleRefresh(editor: vscode.TextEditor, decorationSets: DecorationSets, guideSettings: GuideSettings): void {
+function scheduleRefresh(
+    editor: vscode.TextEditor,
+    decorationSets: DecorationSets,
+    guideSettings: GuideSettings,
+    colorizationEnabled: boolean,
+): void {
     const key = editor.document.uri.toString();
     const existing = updateTimers.get(key);
 
@@ -265,13 +309,14 @@ function scheduleRefresh(editor: vscode.TextEditor, decorationSets: DecorationSe
 
     const timer = setTimeout(() => {
         updateTimers.delete(key);
-        applyRainbowDecorations(editor, decorationSets, guideSettings);
+        applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
     }, 60);
 
     updateTimers.set(key, timer);
 }
 
 export function activate(context: vscode.ExtensionContext): void {
+    let colorizationEnabled = isColorizationEnabled();
     let guideSettings = getGuideSettings();
     let decorationSets: DecorationSets = {
         brackets: createBracketDecorationTypes(getConfiguredColors()),
@@ -300,13 +345,13 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
-        applyRainbowDecorations(activeEditor, decorationSets, guideSettings);
+        applyRainbowDecorations(activeEditor, decorationSets, guideSettings, colorizationEnabled);
     }
 
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor) {
-                scheduleRefresh(editor, decorationSets, guideSettings);
+                scheduleRefresh(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
@@ -315,7 +360,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 return;
             }
 
-            scheduleRefresh(editor, decorationSets, guideSettings);
+            scheduleRefresh(editor, decorationSets, guideSettings, colorizationEnabled);
         }),
         vscode.workspace.onDidCloseTextDocument((doc) => {
             const key = doc.uri.toString();
@@ -326,24 +371,30 @@ export function activate(context: vscode.ExtensionContext): void {
             }
         }),
         vscode.workspace.onDidChangeConfiguration((event) => {
+            const affectsEnabled = event.affectsConfiguration(CONFIG_BRACKETS_ENABLED_KEY);
             const affectsColors = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_COLORS_KEY}`);
             const affectsGuideEnabled = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_ENABLED_KEY}`);
             const affectsGuideThickness = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_THICKNESS_KEY}`);
             const affectsGuideOpacity = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_OPACITY_KEY}`);
 
-            if (!affectsColors && !affectsGuideEnabled && !affectsGuideThickness && !affectsGuideOpacity) {
+            if (!affectsEnabled && !affectsColors && !affectsGuideEnabled && !affectsGuideThickness && !affectsGuideOpacity) {
                 return;
             }
 
-            replaceDecorationSets();
+            colorizationEnabled = isColorizationEnabled();
+
+            if (affectsColors || affectsGuideEnabled || affectsGuideThickness || affectsGuideOpacity) {
+                replaceDecorationSets();
+            }
+
             for (const editor of vscode.window.visibleTextEditors) {
-                applyRainbowDecorations(editor, decorationSets, guideSettings);
+                applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
         vscode.commands.registerCommand('rainbowBrackets.refresh', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
-                applyRainbowDecorations(editor, decorationSets, guideSettings);
+                applyRainbowDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
         {
