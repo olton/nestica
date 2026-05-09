@@ -1,13 +1,13 @@
 {
-  "name": "rainbow",
-  "displayName": "Rainbow",
+  "name": "nestica",
+  "displayName": "Nestica",
   "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
   "version": "0.1.0",
   "publisher": "SerhiiPimenov",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/olton/rainbow.git"
+    "url": "https://github.com/olton/nestica.git"
   },
   "engines": {
     "vscode": "^1.90.0"
@@ -22,19 +22,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "rainbow.refresh",
-        "title": "Rainbow: Refresh"
+        "command": "nestica.refresh",
+        "title": "Nestica: Refresh"
       }
     ],
     "configuration": {
-      "title": "Rainbow",
+      "title": "Nestica Settings",
       "properties": {
-        "rainbow.brackets.enabled": {
+        "nestica.brackets.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable rainbow bracket colorization."
+          "description": "Enable or disable nestica bracket colorization."
         },
-        "rainbow.colors": {
+        "nestica.colors": {
           "type": "array",
           "default": [
             "#E06C75",
@@ -52,19 +52,19 @@
             "type": "string"
           }
         },
-        "rainbow.guides.enabled": {
+        "nestica.guides.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable or disable colored vertical guide lines for bracket blocks."
         },
-        "rainbow.guides.thickness": {
+        "nestica.guides.thickness": {
           "type": "number",
           "default": 1,
           "minimum": 1,
           "maximum": 6,
           "description": "Guide line thickness in pixels."
         },
-        "rainbow.guides.opacity": {
+        "nestica.guides.opacity": {
           "type": "number",
           "default": 0.5,
           "minimum": 0.1,
@@ -85,9 +85,13 @@
     "extension",
     "brackets",
     "color",
-    "rainbow",
+    "nestica",
     "guides",
-    "indentation"
+    "indentation",
+    "nested",
+    "parentheses",
+    "curly braces",
+    "square brackets"
   ],
   "devDependencies": {
     "@types/node": "^22.19.18",
