@@ -7,3 +7,6 @@ tsconfig.json
 *.ts
 *.map
 **/*.map
+assets/
+.github/
+.env
