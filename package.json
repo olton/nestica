@@ -86,7 +86,8 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "package": "npm run build",
-    "vscode:prepublish": "npm run package"
+    "vscode:prepublish": "npm run package",
+    "check": "tsc --noEmit -p ."
   },
   "keywords": [
     "vscode",

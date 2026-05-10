@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 
-import { BracketMatch, FeatureModule, GuideSettings } from '../types';
-import { findCharIndexAtVisualColumn, getVisualIndent } from '../core/text-utils';
+import { BracketMatch, FeatureModule, GuideSettings } from '../core/types';
+import { findCharIndexAtVisualColumn, getVisualIndent } from '../utils/text-utils';
+import { CONFIG_GUIDES_ENABLED_KEY, CONFIG_GUIDES_OPACITY_KEY, CONFIG_GUIDES_THICKNESS_KEY, CONFIG_SECTION } from '../core/constants';
+import { normalizeGuideOpacity, normalizeGuideThickness } from '../utils/color';
 
 function colorWithOpacity(color: string, opacity: number): string {
     const normalized = color.trim();
@@ -88,3 +90,16 @@ export const guidesFeature: FeatureModule = {
     collectRanges: ({ document, matches, colorCount, tabSize }) => collectGuideRangesByColor(document, matches, colorCount, tabSize),
     shouldApply: (guideSettings) => guideSettings.enabled,
 };
+
+export function getGuideSettings(): GuideSettings {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const enabled = config.get<boolean>(CONFIG_GUIDES_ENABLED_KEY, true);
+    const thickness = normalizeGuideThickness(config.get<number>(CONFIG_GUIDES_THICKNESS_KEY, 1));
+    const opacity = normalizeGuideOpacity(config.get<number>(CONFIG_GUIDES_OPACITY_KEY, 1));
+
+    return {
+        enabled,
+        thickness,
+        opacity,
+    };
+}

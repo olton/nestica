@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { BracketMatch, FeatureModule } from '../types';
+import { BracketMatch, FeatureModule } from '../core/types';
 
 export function createBracketDecorationTypes(colors: string[]): vscode.TextEditorDecorationType[] {
     return colors.map((color) =>

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
-import { analyzeBracketPairs } from './core/bracket-analyzer';
-import { normalizeTabSize } from './core/text-utils';
-import { FEATURE_REGISTRY } from './features/registry';
+import { analyzeBracketPairs } from '../utils/bracket-analyzer';
+import { normalizeTabSize } from '../utils/text-utils';
+import { FEATURE_REGISTRY } from '../features/registry';
 import { DecorationSets, GuideSettings } from './types';
 
 export function createDecorationSets(colors: string[], guideSettings: GuideSettings): DecorationSets {

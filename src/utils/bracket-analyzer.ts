@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
-import { CLOSE_TO_OPEN, OPEN_TO_CLOSE } from '../constants';
-import { BracketMatch, StackEntry } from '../types';
+import { CLOSE_TO_OPEN, OPEN_TO_CLOSE } from '../core/constants';
+import { BracketMatch, StackEntry } from '../core/types';
 
 function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number, parentCurlyLevel: number): boolean {
     if (parentCurlyLevel < 0) {
