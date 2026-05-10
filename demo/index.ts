@@ -20,6 +20,10 @@ export function buildNestedMessage(input: string): string {
 		}
 	}
 
+	function hasDigits(str: string): boolean {
+		return /\d/.test(str);
+	}
+
 	return `No letters found: ${cleaned}`;
 }
 

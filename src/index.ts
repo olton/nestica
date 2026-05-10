@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const DEFAULT_BRACKET_COLORS = ['#E06C75', '#E5C07B', '#98C379', '#56B6C2', '#61AFEF', '#C678DD'];
+const DEFAULT_BRACKET_COLORS = ['#61AFEF', '#E06C75', '#E5C07B', '#98C379', '#56B6C2', '#C678DD'];
 
 const CONFIG_SECTION = 'nestica';
 const CONFIG_BRACKETS_ENABLED_KEY = 'nestica.brackets.enabled';
@@ -202,12 +202,31 @@ function createGuideDecorationTypes(colors: string[], guideSettings: GuideSettin
     );
 }
 
-function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number): boolean {
+function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number, parentCurlyLevel: number): boolean {
+    // Keep top-level blocks unshifted so inner control-flow blocks get the next color level.
+    if (parentCurlyLevel < 0) {
+        return false;
+    }
+
     const bracePos = document.positionAt(braceIndex);
     const linePrefix = document.lineAt(bracePos.line).text.slice(0, bracePos.character);
 
-    // Cases like: "): type {", ") => {", "): type => {".
+    // Function-like blocks: "): type {", ") => {", "): type => {".
     return /\)\s*(?:(?::[^{}()]*)\s*(?:=>)?|=>)\s*$/.test(linePrefix);
+}
+
+function isLikelyRegexLiteralStart(text: string, slashIndex: number): boolean {
+    let i = slashIndex - 1;
+
+    while (i >= 0 && /\s/.test(text[i])) {
+        i -= 1;
+    }
+
+    if (i < 0) {
+        return true;
+    }
+
+    return /[\(\[\{=,:;!&|?+\-*%^~<>]/.test(text[i]);
 }
 
 function collectBracketRanges(document: vscode.TextDocument, colorCount: number, tabSize: number): CollectedDecorations {
@@ -217,12 +236,60 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
     const stack: StackEntry[] = [];
     let inSingleQuotedString = false;
     let inDoubleQuotedString = false;
+    let inTemplateString = false;
+    let inLineComment = false;
+    let inBlockComment = false;
+    let inRegexLiteral = false;
+    let inRegexCharClass = false;
     let isEscaped = false;
 
     for (let i = 0; i < text.length; i += 1) {
         const ch = text[i];
 
-        if (inSingleQuotedString || inDoubleQuotedString) {
+        if (inLineComment) {
+            if (ch === '\n') {
+                inLineComment = false;
+            }
+            continue;
+        }
+
+        if (inBlockComment) {
+            if (ch === '*' && text[i + 1] === '/') {
+                inBlockComment = false;
+                i += 1;
+            }
+            continue;
+        }
+
+        if (inRegexLiteral) {
+            if (isEscaped) {
+                isEscaped = false;
+                continue;
+            }
+
+            if (ch === '\\') {
+                isEscaped = true;
+                continue;
+            }
+
+            if (ch === '[') {
+                inRegexCharClass = true;
+                continue;
+            }
+
+            if (ch === ']' && inRegexCharClass) {
+                inRegexCharClass = false;
+                continue;
+            }
+
+            if (ch === '/' && !inRegexCharClass) {
+                inRegexLiteral = false;
+            }
+
+            continue;
+        }
+
+        if (inSingleQuotedString || inDoubleQuotedString || inTemplateString) {
             if (isEscaped) {
                 isEscaped = false;
                 continue;
@@ -243,6 +310,29 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
                 continue;
             }
 
+            if (inTemplateString && ch === '`') {
+                inTemplateString = false;
+                continue;
+            }
+
+            continue;
+        }
+
+        if (ch === '/' && text[i + 1] === '/') {
+            inLineComment = true;
+            i += 1;
+            continue;
+        }
+
+        if (ch === '/' && text[i + 1] === '*') {
+            inBlockComment = true;
+            i += 1;
+            continue;
+        }
+
+        if (ch === '/' && text[i + 1] !== '/' && text[i + 1] !== '*' && isLikelyRegexLiteralStart(text, i)) {
+            inRegexLiteral = true;
+            inRegexCharClass = false;
             continue;
         }
 
@@ -256,8 +346,26 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
             continue;
         }
 
+        if (ch === '`') {
+            inTemplateString = true;
+            continue;
+        }
+
         if (OPEN_TO_CLOSE[ch]) {
-            const level = ch === '{' && shouldOffsetCurlyBraceLevel(document, i) ? stack.length + 1 : stack.length;
+            let level = stack.length;
+
+            if (ch === '{') {
+                let parentCurlyLevel = -1;
+                for (let j = stack.length - 1; j >= 0; j -= 1) {
+                    if (stack[j].char === '{') {
+                        parentCurlyLevel = stack[j].level;
+                        break;
+                    }
+                }
+
+                const baseLevel = parentCurlyLevel + 1;
+                level = shouldOffsetCurlyBraceLevel(document, i, parentCurlyLevel) ? baseLevel + 1 : baseLevel;
+            }
 
             stack.push({ char: ch, index: i, level });
             continue;
@@ -407,6 +515,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
             scheduleRefresh(editor, decorationSets, guideSettings, colorizationEnabled);
         }),
+
         vscode.workspace.onDidCloseTextDocument((doc) => {
             const key = doc.uri.toString();
             const timer = updateTimers.get(key);
@@ -415,6 +524,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 updateTimers.delete(key);
             }
         }),
+
         vscode.workspace.onDidChangeConfiguration((event) => {
             const affectsEnabled = event.affectsConfiguration(CONFIG_BRACKETS_ENABLED_KEY);
             const affectsColors = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_COLORS_KEY}`);

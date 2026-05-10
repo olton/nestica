@@ -35,6 +35,11 @@
 	padding: 20px;
 	font-family: Arial, sans-serif;
 	line-height: 1.5;
+
+    &:hover {
+        background: #f0f0f0;
+        color: #000;
+    }
 }
 
 button {

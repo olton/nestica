@@ -45,7 +45,6 @@
         "nestica.colors": {
           "type": "array",
           "default": [
-            "#E06C75",
             "#E5C07B",
             "#98C379",
             "#56B6C2",
@@ -53,7 +52,8 @@
             "#C678DD",
             "#BE5046",
             "#D19A66",
-            "#AF1320"
+            "#AF1320",
+            "#E06C75"
           ],
           "description": "List of colors used to paint bracket nesting levels.",
           "items": {
