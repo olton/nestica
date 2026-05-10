@@ -215,14 +215,49 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
     const guideRangesByColor = Array.from({ length: colorCount }, () => [] as vscode.Range[]);
     const text = document.getText();
     const stack: StackEntry[] = [];
+    let inSingleQuotedString = false;
+    let inDoubleQuotedString = false;
+    let isEscaped = false;
 
     for (let i = 0; i < text.length; i += 1) {
         const ch = text[i];
 
+        if (inSingleQuotedString || inDoubleQuotedString) {
+            if (isEscaped) {
+                isEscaped = false;
+                continue;
+            }
+
+            if (ch === '\\') {
+                isEscaped = true;
+                continue;
+            }
+
+            if (inSingleQuotedString && ch === "'") {
+                inSingleQuotedString = false;
+                continue;
+            }
+
+            if (inDoubleQuotedString && ch === '"') {
+                inDoubleQuotedString = false;
+                continue;
+            }
+
+            continue;
+        }
+
+        if (ch === "'") {
+            inSingleQuotedString = true;
+            continue;
+        }
+
+        if (ch === '"') {
+            inDoubleQuotedString = true;
+            continue;
+        }
+
         if (OPEN_TO_CLOSE[ch]) {
-            const level = ch === '{' && shouldOffsetCurlyBraceLevel(document, i)
-                ? stack.length + 1
-                : stack.length;
+            const level = ch === '{' && shouldOffsetCurlyBraceLevel(document, i) ? stack.length + 1 : stack.length;
 
             stack.push({ char: ch, index: i, level });
             continue;
@@ -277,9 +312,7 @@ function collectBracketRanges(document: vscode.TextDocument, colorCount: number,
                 if (charIndex !== -1) {
                     const pos = new vscode.Position(line, charIndex);
                     // Використовуємо діапазон в один символ для того, щоб декорація (border-left) була видимою.
-                    const range = charIndex < textLine.text.length
-                        ? new vscode.Range(pos, pos.translate(0, 1))
-                        : new vscode.Range(pos, pos);
+                    const range = charIndex < textLine.text.length ? new vscode.Range(pos, pos.translate(0, 1)) : new vscode.Range(pos, pos);
                     guideRangesByColor[colorIndex].push(range);
                 }
             }
@@ -296,12 +329,7 @@ function clearNesticaDecorations(editor: vscode.TextEditor, decorationSets: Deco
     }
 }
 
-function applyNesticaDecorations(
-    editor: vscode.TextEditor,
-    decorationSets: DecorationSets,
-    guideSettings: GuideSettings,
-    colorizationEnabled: boolean,
-): void {
+function applyNesticaDecorations(editor: vscode.TextEditor, decorationSets: DecorationSets, guideSettings: GuideSettings, colorizationEnabled: boolean): void {
     if (!colorizationEnabled) {
         clearNesticaDecorations(editor, decorationSets);
         return;
@@ -316,12 +344,7 @@ function applyNesticaDecorations(
     }
 }
 
-function scheduleRefresh(
-    editor: vscode.TextEditor,
-    decorationSets: DecorationSets,
-    guideSettings: GuideSettings,
-    colorizationEnabled: boolean,
-): void {
+function scheduleRefresh(editor: vscode.TextEditor, decorationSets: DecorationSets, guideSettings: GuideSettings, colorizationEnabled: boolean): void {
     const key = editor.document.uri.toString();
     const existing = updateTimers.get(key);
 
@@ -413,7 +436,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
         }),
-        
+
         vscode.commands.registerCommand('nestica.refresh', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {

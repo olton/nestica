@@ -47,3 +47,11 @@ const testInput = () => {
 	
 	}
 }
+
+function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number): boolean {
+    const bracePos = document.positionAt(braceIndex);
+    const linePrefix = document.lineAt(bracePos.line).text.slice(0, bracePos.character);
+
+    // Cases like: "): type {", ") => {", "): type => {".
+    return /\)\s*(?:(?::[^{}()]*)\s*(?:=>)?|=>)\s*$/.test(linePrefix);
+}
