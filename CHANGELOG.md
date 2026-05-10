@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 - 10/05/2026
+
+- Fixed HTML files support
+- Fixed Vue files support
+
 ## 0.2.1 - 10/05/2026
 
 - Changed logo
