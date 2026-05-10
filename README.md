@@ -6,6 +6,13 @@ Nestica is a Visual Studio Code extension that colors nested bracket pairs for b
 - Supported file types: Any files with these brackets (e.g. JavaScript, Python, C++, etc.)
 - Customizable colors and guide lines
 
+## Screenshots
+
+| Example with code | Brackets |
+| --- | --- |
+| ![Nestica bracket highlighting](images/screenshot-1.png) | ![Nestica settings](images/screenshot-2.png) |
+
+
 ## Features
 
 - Colors both opening and closing brackets by nesting depth
@@ -61,11 +68,6 @@ You can customize colors in your VS Code settings:
 	"nestica.guides.opacity": 1
 }
 ```
-
-## Screenshots
-
-![Nestica bracket highlighting](images/screenshot-1.png)
-![Nestica settings](images/screenshot-2.png)
 
 ## Contributing
 

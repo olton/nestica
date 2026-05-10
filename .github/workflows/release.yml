@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Resolve extension version
+        id: version
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Package VSIX
+        shell: bash
+        run: |
+          npx @vscode/vsce package --out "nestica-${VERSION}.vsix"
+
+      - name: Extract release notes from CHANGELOG.md
+        shell: bash
+        run: |
+          if ! awk -v ver="$VERSION" '
+            BEGIN {
+              escaped_ver = ver
+              gsub(/[][(){}.^$*+?|\\]/, "\\\\&", escaped_ver)
+              section_re = "^##[[:space:]]+" escaped_ver "([[:space:]]+-[[:space:]].*)?$"
+            }
+            $0 ~ section_re { in_section = 1; next }
+            in_section && $0 ~ /^##[[:space:]]+/ { exit }
+            in_section {
+              print
+              if ($0 !~ /^[[:space:]]*$/) has_content = 1
+            }
+            END {
+              if (!in_section || !has_content) {
+                exit 2
+              }
+            }
+          ' CHANGELOG.md > RELEASE_NOTES.md; then
+            echo "::error::Could not find non-empty changelog section for version $VERSION"
+            exit 1
+          fi
+
+      - name: Create or update GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          bodyFile: RELEASE_NOTES.md
+          artifacts: nestica-${{ steps.version.outputs.version }}.vsix
+          allowUpdates: true
+          replacesArtifacts: true
+
+      - name: Publish to VS Code Marketplace
+        shell: bash
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "::error::Missing VSCE_PAT secret"
+            exit 1
+          fi
+
+          set +e
+          OUTPUT=$(npx @vscode/vsce publish --packagePath "nestica-${VERSION}.vsix" -p "$VSCE_PAT" 2>&1)
+          EXIT_CODE=$?
+          set -e
+
+          echo "$OUTPUT"
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            if echo "$OUTPUT" | grep -qi "already exists"; then
+              echo "Version $VERSION is already published in VS Code Marketplace."
+              exit 0
+            fi
+
+            exit $EXIT_CODE
+          fi
+
+      - name: Publish to Open VSX
+        shell: bash
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "::error::Missing OVSX_PAT secret"
+            exit 1
+          fi
+
+          set +e
+          OUTPUT=$(npx ovsx publish "nestica-${VERSION}.vsix" -p "$OVSX_PAT" 2>&1)
+          EXIT_CODE=$?
+          set -e
+
+          echo "$OUTPUT"
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            if echo "$OUTPUT" | grep -Eqi "already exists|duplicate|already published"; then
+              echo "Version $VERSION is already published in Open VSX."
+              exit 0
+            fi
+
+            exit $EXIT_CODE
+          fi
