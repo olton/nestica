@@ -1,0 +1,22 @@
+{
+    "name": "demo",
+    "displayName": "Demo",
+    "description": "Demo extension for testing purposes.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/demo.git"
+    },
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com",
+            "address": {
+                "street": "123 Main St",
+                "city": "Anytown",
+                "state": "CA",
+                "postalCode": "12345",
+                "country": "USA"
+            }
+        }
+    ]
+}

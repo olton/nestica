@@ -41,7 +41,6 @@ const testInput = () => {
 		console.log(buildNestedMessage(input));
 	}
 
-
 	return () => {
 		console.log("Test completed");
 

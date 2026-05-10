@@ -21,7 +21,12 @@
     "theme": "dark"
   },
   "activationEvents": [
-    "onLanguage"
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onStartupFinished"
   ],
   "main": "./dist/index.js",
   "contributes": {
@@ -29,6 +34,10 @@
       {
         "command": "nestica.refresh",
         "title": "Nestica: Refresh"
+      },
+      {
+        "command": "nestica.showOutput",
+        "title": "Nestica: Show Output"
       }
     ],
     "configurationDefaults": {
@@ -87,7 +96,8 @@
     "watch": "tsc -w -p .",
     "package": "npm run build",
     "vscode:prepublish": "npm run package",
-    "check": "tsc --noEmit -p ."
+    "check": "tsc --noEmit -p .",
+    "compile": "vsce package"
   },
   "keywords": [
     "vscode",

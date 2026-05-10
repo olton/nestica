@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { analyzeBracketPairs } from '../utils/bracket-analyzer';
+import { isLanguageSupported } from './config';
 import { normalizeTabSize } from '../utils/text-utils';
 import { FEATURE_REGISTRY } from '../features/registry';
 import { DecorationSets, GuideSettings } from './types';
@@ -42,7 +43,13 @@ export function applyNesticaDecorations(
         return;
     }
 
+    if (!isLanguageSupported(editor.document.languageId)) {
+        clearNesticaDecorations(editor, decorationSets);
+        return;
+    }
+
     const tabSize = normalizeTabSize(editor.options.tabSize);
+
     const matches = analyzeBracketPairs(editor.document);
 
     for (const feature of FEATURE_REGISTRY) {

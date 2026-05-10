@@ -2,6 +2,7 @@
 
 ## 0.3.0 - 10/05/2026
 
+- Refactoring to module structure for better maintainability
 - Fixed HTML files support
 - Fixed Vue files support
 
