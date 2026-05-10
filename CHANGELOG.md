@@ -1,10 +1,9 @@
 # Changelog
 
-## 0.3.0 - 10/05/2026
+## 0.2.2 - 10/05/2026
 
 - Refactoring to module structure for better maintainability
-- Fixed HTML files support
-- Fixed Vue files support
+- Limit supported file types to TypeScript, JavaScript, CSS, SCSS, LESS, and JSON for improved performance
 
 ## 0.2.1 - 10/05/2026
 

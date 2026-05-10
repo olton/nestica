@@ -63,14 +63,6 @@ You can customize colors in your VS Code settings:
 		"#4895EF",
 		"#B5179E"
 	],
-	"nestica.languages": [
-		"typescript",
-		"javascript",
-		"css",
-		"scss",
-		"less",
-		"json"
-	],
 	"nestica.guides.enabled": true,
 	"nestica.guides.thickness": 1,
 	"nestica.guides.opacity": 1

@@ -2,7 +2,7 @@
   "name": "nestica",
   "displayName": "Nestica",
   "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
-  "version": "0.3.0",
+  "version": "0.2.2",
   "publisher": "SerhiiPimenov",
   "license": "MIT",
   "repository": {
