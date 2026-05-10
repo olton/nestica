@@ -43,15 +43,25 @@ jobs:
       - name: Extract release notes from CHANGELOG.md
         shell: bash
         run: |
-          awk -v ver="$VERSION" '
-            $0 ~ "^## " ver " - " { found=1; print; next }
-            found && $0 ~ /^$/ { exit }
-            found && $0 ~ /^## / { exit }
-            found { print }
-          ' CHANGELOG.md > RELEASE_NOTES.md
-
-          if [ ! -s RELEASE_NOTES.md ]; then
-            echo "::error::Could not find changelog section for version $VERSION"
+          if ! awk -v ver="$VERSION" '
+            BEGIN {
+              escaped_ver = ver
+              gsub(/[][(){}.^$*+?|\\]/, "\\\\&", escaped_ver)
+              section_re = "^##[[:space:]]+" escaped_ver "([[:space:]]+-[[:space:]].*)?$"
+            }
+            $0 ~ section_re { in_section = 1; next }
+            in_section && $0 ~ /^##[[:space:]]+/ { exit }
+            in_section {
+              print
+              if ($0 !~ /^[[:space:]]*$/) has_content = 1
+            }
+            END {
+              if (!in_section || !has_content) {
+                exit 2
+              }
+            }
+          ' CHANGELOG.md > RELEASE_NOTES.md; then
+            echo "::error::Could not find non-empty changelog section for version $VERSION"
             exit 1
           fi
 
