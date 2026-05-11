@@ -62,6 +62,10 @@ You can customize colors in your VS Code settings:
 }
 ```
 
+> [!NOTE]
+> When `nestica.guides.fillEmptyLines` is enabled, Nestica inserts indentation into empty lines inside bracket blocks so guide lines can render continuously.
+> This changes the document text (visible in undo history and Git diff).
+
 ## Contributing
 
 Contributions are welcome. Feel free to submit a pull request or open an issue.
