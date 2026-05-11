@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4 - 10/05/2026
+
+- Remove indent fix for empty lines in guides, as it caused issues with unsaved file.
+
 ## 0.2.3 - 10/05/2026
 
 - Fixed guides visualization for empty lines by inserting indent strings, improving the accuracy of guide placement

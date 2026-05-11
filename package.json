@@ -2,7 +2,7 @@
     "name": "nestica",
     "displayName": "Nestica",
     "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "publisher": "SerhiiPimenov",
     "license": "MIT",
     "repository": {
@@ -87,11 +87,6 @@
                     "minimum": 0.1,
                     "maximum": 1,
                     "description": "Guide line opacity from 0.1 to 1. Default is 0.3 for a subtle effect."
-                },
-                "nestica.guides.fillEmptyLines": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Insert indentation on empty lines inside bracket blocks so guide lines can render continuously."
                 }
             }
         }

@@ -10,8 +10,6 @@ import {
     CONFIG_SECTION,
 } from '../core/constants';
 import { normalizeGuideOpacity, normalizeGuideThickness } from '../utils/color';
-import { getIndentString } from '../utils/indent';
-import { log } from '../core/output';
 
 function colorWithOpacity(color: string, opacity: number): string {
     const normalized = color.trim();
@@ -40,42 +38,6 @@ function colorWithOpacity(color: string, opacity: number): string {
     return normalized;
 }
 
-function tryInsertGuideIndent(document: vscode.TextDocument, line: number, guideColumn: number, fallbackTabSize: number): void {
-    const textLine = document.lineAt(line);
-    if (textLine.text.trim().length > 0) {
-        return;
-    }
-
-    const editor = vscode.window.activeTextEditor;
-    if (!editor || editor.document.uri.toString() !== document.uri.toString()) {
-        return;
-    }
-
-    const tabSize = typeof editor.options.tabSize === 'number' ? editor.options.tabSize : fallbackTabSize;
-    const insertSpaces = typeof editor.options.insertSpaces === 'boolean' ? editor.options.insertSpaces : true;
-    const indentString = getIndentString(guideColumn, tabSize, insertSpaces);
-
-    if (!indentString) {
-        return;
-    }
-
-    void editor
-        .edit(
-            (editBuilder) => {
-                editBuilder.insert(new vscode.Position(line, 0), indentString);
-            },
-            {
-                undoStopBefore: false,
-                undoStopAfter: false,
-            },
-        )
-        .then((applied) => {
-            if (applied) {
-                log(`Inserted indent string on line ${line + 1} for guide visualization.`);
-            }
-        });
-}
-
 export function createGuideDecorationTypes(colors: string[], guideSettings: GuideSettings): vscode.TextEditorDecorationType[] {
     if (!guideSettings.enabled) {
         return colors.map(() =>
@@ -100,7 +62,6 @@ export function collectGuideRangesByColor(
     matches: BracketMatch[],
     colorCount: number,
     tabSize: number,
-    fillEmptyLines: boolean,
 ): vscode.Range[][] {
     const guideRangesByColor = Array.from({ length: colorCount }, () => [] as vscode.Range[]);
 
@@ -118,18 +79,7 @@ export function collectGuideRangesByColor(
             let charIndex = findCharIndexAtVisualColumn(textLine.text, guideColumn, tabSize);
 
             if (charIndex === -1) {
-                if (!fillEmptyLines) {
-                    continue;
-                }
-
-                if (textLine.text.trim().length > 0) {
-                    continue;
-                }
-
-                const prevLine = document.lineAt(line - 1);
-                const prevCharIndex = findCharIndexAtVisualColumn(prevLine.text, guideColumn, tabSize);
-                tryInsertGuideIndent(document, line, guideColumn, tabSize);
-                charIndex = prevCharIndex !== -1 ? prevCharIndex : 0;
+                continue;
             }
 
             const pos = new vscode.Position(line, charIndex);
@@ -145,8 +95,7 @@ export function collectGuideRangesByColor(
 export const guidesFeature: FeatureModule = {
     id: 'guides',
     createDecorationTypes: createGuideDecorationTypes,
-    collectRanges: ({ document, matches, colorCount, tabSize, guideSettings }) =>
-        collectGuideRangesByColor(document, matches, colorCount, tabSize, guideSettings.fillEmptyLines),
+    collectRanges: ({ document, matches, colorCount, tabSize }) => collectGuideRangesByColor(document, matches, colorCount, tabSize),
     shouldApply: (guideSettings) => guideSettings.enabled,
 };
 
