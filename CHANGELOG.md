@@ -3,6 +3,8 @@
 ## 0.2.3 - 10/05/2026
 
 - Fixed guides visualization for empty lines by inserting indent strings, improving the accuracy of guide placement
+- Added popular C-like languages (C, C++, C#, Java, ...) to the list of supported languages for bracket highlighting and guides
+- Added Vue, JSX, TSX, HTML support
 
 ## 0.2.2 - 10/05/2026
 

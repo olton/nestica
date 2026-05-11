@@ -3,7 +3,7 @@
 Nestica is a Visual Studio Code extension that colors nested bracket pairs for better readability.
 
 - Supported bracket types: `()`, `{}`, `[]`, `<>`
-- Supported file types: TypeScript, JavaScript, CSS, SCSS, LESS, JSON
+- Supported file types: TypeScript, JavaScript, CSS, SCSS, LESS, JSON, JSONC, Vue, HTML, JSX, TSX, C-like languages (C, C++, C#, Java, ...)
 - Customizable colors and guide lines
 
 ## Screenshots
