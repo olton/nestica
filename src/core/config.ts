@@ -51,6 +51,4 @@ export function isLanguageSupported(languageId: string): boolean {
     return getConfiguredLanguageIds().includes(languageId.toLowerCase());
 }
 
-export {
-    getGuideSettings,
-}
+export { getGuideSettings };
