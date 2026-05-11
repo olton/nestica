@@ -45,7 +45,9 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor) {
-                scheduleRefresh(editor, (nextEditor) => applyNesticaDecorations(nextEditor, decorationSets, guideSettings, colorizationEnabled));
+                scheduleRefresh(editor, (nextEditor) =>
+                    applyNesticaDecorations(nextEditor, decorationSets, guideSettings, colorizationEnabled),
+                );
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
@@ -54,7 +56,9 @@ export function activate(context: vscode.ExtensionContext): void {
                 return;
             }
 
-            scheduleRefresh(editor, (nextEditor) => applyNesticaDecorations(nextEditor, decorationSets, guideSettings, colorizationEnabled));
+            scheduleRefresh(editor, (nextEditor) =>
+                applyNesticaDecorations(nextEditor, decorationSets, guideSettings, colorizationEnabled),
+            );
         }),
 
         vscode.workspace.onDidCloseTextDocument((doc) => {
@@ -69,7 +73,14 @@ export function activate(context: vscode.ExtensionContext): void {
             const affectsGuideThickness = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_THICKNESS_KEY}`);
             const affectsGuideOpacity = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_OPACITY_KEY}`);
 
-            if (!affectsEnabled && !affectsColors && !affectsLanguages && !affectsGuideEnabled && !affectsGuideThickness && !affectsGuideOpacity) {
+            if (
+                !affectsEnabled &&
+                !affectsColors &&
+                !affectsLanguages &&
+                !affectsGuideEnabled &&
+                !affectsGuideThickness &&
+                !affectsGuideOpacity
+            ) {
                 return;
             }
 

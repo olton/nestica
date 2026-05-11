@@ -34,9 +34,16 @@ const testInput = () => {
         console.log(buildNestedMessage(input));
     }
 
+    const hex = 'FF5733';
+    const opacity = 0.5;
+    const rr = parseInt(hex.slice(0, 2), 16);
+    const gg = parseInt(hex.slice(2, 4), 16);
+    const bb = parseInt(hex.slice(4, 6), 16);
+    const rgba = `rgba(${rr}, ${gg}, ${bb}, ${opacity})`;
+
     return () => {
         console.log('Test completed');
-
+        console.log(`RGBA color: ${rgba}`);
         return () => {
             console.log('Test completed');
         };
