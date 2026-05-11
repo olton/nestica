@@ -8,10 +8,9 @@ Nestica is a Visual Studio Code extension that colors nested bracket pairs for b
 
 ## Screenshots
 
-| Example with code | Brackets |
-| --- | --- |
+| Example with code                                        | Brackets                                     |
+| -------------------------------------------------------- | -------------------------------------------- |
 | ![Nestica bracket highlighting](images/screenshot-1.png) | ![Nestica settings](images/screenshot-2.png) |
-
 
 ## Features
 
@@ -23,16 +22,16 @@ Nestica is a Visual Studio Code extension that colors nested bracket pairs for b
 
 1. Install:
 
-	```bash
-	git clone https://github.com/olton/nestica.git
-	cd nestica
-	```
+    ```bash
+    git clone https://github.com/olton/nestica.git
+    cd nestica
+    ```
 
 2. Build extension sources:
 
-	```bash
-	npm run build
-	```
+    ```bash
+    npm run build
+    ```
 
 3. Open this project in VS Code and press `F5` to start the Extension Development Host.
 
@@ -40,7 +39,7 @@ Nestica is a Visual Studio Code extension that colors nested bracket pairs for b
 
 You can install Nestica from the Visual Studio Code Marketplace: [Nestica](https://marketplace.visualstudio.com/items?itemName=SerhiiPimenov.nestica)
 
-or 
+or
 
 Open the Extensions view in VS Code, search for "Nestica", and click "Install".
 
@@ -54,18 +53,12 @@ You can customize colors in your VS Code settings:
 
 ```json
 {
-	"nestica.brackets.enabled": true,
-	"nestica.colors": [
-		"#FF6B6B",
-		"#FFD166",
-		"#06D6A0",
-		"#4CC9F0",
-		"#4895EF",
-		"#B5179E"
-	],
-	"nestica.guides.enabled": true,
-	"nestica.guides.thickness": 1,
-	"nestica.guides.opacity": 1
+    "nestica.brackets.enabled": true,
+    "nestica.colors": ["#FF6B6B", "#FFD166", "#06D6A0", "#4CC9F0", "#4895EF", "#B5179E"],
+    "nestica.guides.enabled": true,
+    "nestica.guides.thickness": 1,
+    "nestica.guides.opacity": 1,
+    "nestica.guides.fillEmptyLines": true
 }
 ```
 
@@ -77,11 +70,11 @@ Contributions are welcome. Feel free to submit a pull request or open an issue.
 
 If you like this project, please consider supporting it by:
 
-+ Star this repository on GitHub
-+ Sponsor this project on GitHub Sponsors
-+ **PayPal** to `serhii@pimenov.com.ua`.
-+ [**Patreon**](https://www.patreon.com/metroui)
-+ [**Buy me a coffee**](https://buymeacoffee.com/pimenov)
+- Star this repository on GitHub
+- Sponsor this project on GitHub Sponsors
+- **PayPal** to `serhii@pimenov.com.ua`.
+- [**Patreon**](https://www.patreon.com/metroui)
+- [**Buy me a coffee**](https://buymeacoffee.com/pimenov)
 
 ---
 

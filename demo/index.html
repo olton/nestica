@@ -1,75 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 0 16px;
-            line-height: 1.5;
-        }
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        h1 {
-            margin-top: 0;
-        }
-        input, textarea, button {
-            width: 100%;
-            margin-top: 8px;
-            margin-bottom: 10px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        ul {
-            padding-left: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Simple Planning Test</h1>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>Planning Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 700px;
+                margin: 30px auto;
+                padding: 0 16px;
+                line-height: 1.5;
+            }
+            .card {
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 16px;
+                margin-bottom: 16px;
 
-    <div class="card">
-        <h2>Add task</h2>
-        <input id="taskTitle" type="text" placeholder="Task title">
-        <textarea id="taskNote" rows="3" placeholder="Task note"></textarea>
-        <button id="addBtn" type="button">Add task</button>
-    </div>
+                &:hover {
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-    <div class="card">
-        <h2>Tasks</h2>
-        <ul id="taskList">
-            <li>Example: Check planning flow</li>
-        </ul>
-    </div>
+                    button {
+                        background-color: #007bff;
+                        color: white;
+                    }
+                }
+            }
+            h1 {
+                margin-top: 0;
+            }
+            input,
+            textarea,
+            button {
+                width: 100%;
+                margin-top: 8px;
+                margin-bottom: 10px;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+            ul {
+                padding-left: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Simple Planning Test</h1>
 
-    <script>
-        const titleInput = document.getElementById('taskTitle');
-        const noteInput = document.getElementById('taskNote');
-        const addBtn = document.getElementById('addBtn');
-        const taskList = document.getElementById('taskList');
+        <div class="card">
+            <h2>Add task</h2>
+            <input
+                id="taskTitle"
+                type="text"
+                placeholder="Task title"
+            />
+            <textarea
+                id="taskNote"
+                rows="3"
+                placeholder="Task note"
+            ></textarea>
+            <button
+                id="addBtn"
+                type="button"
+            >
+                Add task
+            </button>
+        </div>
 
-        addBtn.addEventListener('click', () => {
-            const title = titleInput.value.trim();
-            const note = noteInput.value.trim();
+        <div class="card">
+            <h2>Tasks</h2>
+            <ul id="taskList">
+                <li>Example: Check planning flow</li>
+            </ul>
+        </div>
 
-            if (!title) return;
+        <script>
+            const titleInput = document.getElementById('taskTitle');
+            const noteInput = document.getElementById('taskNote');
+            const addBtn = document.getElementById('addBtn');
+            const taskList = document.getElementById('taskList');
 
-            const li = document.createElement('li');
-            li.textContent = note ? `${title} — ${note}` : title;
-            taskList.appendChild(li);
+            addBtn.addEventListener('click', () => {
+                const title = titleInput.value.trim();
+                const note = noteInput.value.trim();
 
-            titleInput.value = '';
-            noteInput.value = '';
-            titleInput.focus();
-        });
-    </script>
-</body>
+                if (!title) return;
+
+                const li = document.createElement('li');
+                li.textContent = note ? `${title} — ${note}` : title;
+                taskList.appendChild(li);
+
+                titleInput.value = '';
+                noteInput.value = '';
+                titleInput.focus();
+            });
+        </script>
+    </body>
 </html>

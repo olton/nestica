@@ -35,4 +35,5 @@ export type GuideSettings = {
     enabled: boolean;
     thickness: number;
     opacity: number;
+    fillEmptyLines: boolean;
 };

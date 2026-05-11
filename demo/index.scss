@@ -3,33 +3,33 @@ $bg: #f8fafc;
 $text: #1f2937;
 
 .card {
-	background: $bg;
-	color: $text;
-	border: 1px solid lighten($primary, 25%);
-	border-radius: 12px;
-	padding: 16px;
+    background: $bg;
+    color: $text;
+    border: 1px solid lighten($primary, 25%);
+    border-radius: 12px;
+    padding: 16px;
 
-	&__title {
-		margin: 0 0 8px;
-		font-size: 18px;
-		color: $primary;
-	}
+    &__title {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: $primary;
+    }
 
-	&__content {
-		font-size: 14px;
-		line-height: 1.5;
+    &__content {
+        font-size: 14px;
+        line-height: 1.5;
 
-		a {
-			color: darken($primary, 8%);
-			text-decoration: none;
+        a {
+            color: darken($primary, 8%);
+            text-decoration: none;
 
-			&:hover {
-				text-decoration: underline;
-			}
-		}
-	}
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
 
-	&:hover {
-		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-	}
+    &:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
 }

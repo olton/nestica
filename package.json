@@ -1,121 +1,126 @@
 {
-  "name": "nestica",
-  "displayName": "Nestica",
-  "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
-  "version": "0.2.2",
-  "publisher": "SerhiiPimenov",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/olton/nestica.git"
-  },
-  "engines": {
-    "vscode": "^1.90.0"
-  },
-  "categories": [
-    "Programming Languages"
-  ],
-  "icon": "images/icon.png",
-  "galleryBanner": {
-    "color": "#0F172A",
-    "theme": "dark"
-  },
-  "activationEvents": [
-    "onLanguage:typescript",
-    "onLanguage:javascript",
-    "onLanguage:css",
-    "onLanguage:scss",
-    "onLanguage:less",
-    "onStartupFinished"
-  ],
-  "main": "./dist/index.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "nestica.refresh",
-        "title": "Nestica: Refresh"
-      },
-      {
-        "command": "nestica.showOutput",
-        "title": "Nestica: Show Output"
-      }
-    ],
-    "configurationDefaults": {
-      "editor.bracketPairColorization.enabled": false
+    "name": "nestica",
+    "displayName": "Nestica",
+    "description": "Color nested (), {}, and [] in different colors for better readability and block indentation.",
+    "version": "0.2.3",
+    "publisher": "SerhiiPimenov",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/olton/nestica.git"
     },
-    "configuration": {
-      "title": "Nestica Settings",
-      "properties": {
-        "nestica.brackets.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable or disable nestica bracket colorization."
+    "engines": {
+        "vscode": "^1.90.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#0F172A",
+        "theme": "dark"
+    },
+    "activationEvents": [
+        "onLanguage:typescript",
+        "onLanguage:javascript",
+        "onLanguage:css",
+        "onLanguage:scss",
+        "onLanguage:less",
+        "onStartupFinished"
+    ],
+    "main": "./dist/index.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "nestica.refresh",
+                "title": "Nestica: Refresh"
+            },
+            {
+                "command": "nestica.showOutput",
+                "title": "Nestica: Show Output"
+            }
+        ],
+        "configurationDefaults": {
+            "editor.bracketPairColorization.enabled": false
         },
-        "nestica.colors": {
-          "type": "array",
-          "default": [
-            "#E5C07B",
-            "#98C379",
-            "#56B6C2",
-            "#61AFEF",
-            "#C678DD",
-            "#BE5046",
-            "#D19A66",
-            "#AF1320",
-            "#E06C75"
-          ],
-          "description": "List of colors used to paint bracket nesting levels.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "nestica.guides.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable or disable colored vertical guide lines for bracket blocks."
-        },
-        "nestica.guides.thickness": {
-          "type": "number",
-          "default": 1,
-          "minimum": 1,
-          "maximum": 6,
-          "description": "Guide line thickness in pixels."
-        },
-        "nestica.guides.opacity": {
-          "type": "number",
-          "default": 0.3,
-          "minimum": 0.1,
-          "maximum": 1,
-          "description": "Guide line opacity from 0.1 to 1. Default is 0.3 for a subtle effect."
+        "configuration": {
+            "title": "Nestica Settings",
+            "properties": {
+                "nestica.brackets.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable nestica bracket colorization."
+                },
+                "nestica.colors": {
+                    "type": "array",
+                    "default": [
+                        "#E5C07B",
+                        "#98C379",
+                        "#56B6C2",
+                        "#61AFEF",
+                        "#C678DD",
+                        "#BE5046",
+                        "#D19A66",
+                        "#AF1320",
+                        "#E06C75"
+                    ],
+                    "description": "List of colors used to paint bracket nesting levels.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "nestica.guides.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable colored vertical guide lines for bracket blocks."
+                },
+                "nestica.guides.thickness": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 1,
+                    "maximum": 6,
+                    "description": "Guide line thickness in pixels."
+                },
+                "nestica.guides.opacity": {
+                    "type": "number",
+                    "default": 0.3,
+                    "minimum": 0.1,
+                    "maximum": 1,
+                    "description": "Guide line opacity from 0.1 to 1. Default is 0.3 for a subtle effect."
+                },
+                "nestica.guides.fillEmptyLines": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Insert indentation on empty lines inside bracket blocks so guide lines can render continuously."
+                }
+            }
         }
-      }
+    },
+    "scripts": {
+        "build": "tsc -p .",
+        "watch": "tsc -w -p .",
+        "package": "npm run build",
+        "vscode:prepublish": "npm run package",
+        "check": "tsc --noEmit -p .",
+        "compile": "vsce package"
+    },
+    "keywords": [
+        "vscode",
+        "extension",
+        "brackets",
+        "color",
+        "nestica",
+        "guides",
+        "indentation",
+        "nested",
+        "parentheses",
+        "curly braces",
+        "square brackets"
+    ],
+    "devDependencies": {
+        "@types/node": "^22.19.18",
+        "@types/vscode": "^1.90.0",
+        "@vscode/vsce": "^3.9.1",
+        "typescript": "^5.8.3"
     }
-  },
-  "scripts": {
-    "build": "tsc -p .",
-    "watch": "tsc -w -p .",
-    "package": "npm run build",
-    "vscode:prepublish": "npm run package",
-    "check": "tsc --noEmit -p .",
-    "compile": "vsce package"
-  },
-  "keywords": [
-    "vscode",
-    "extension",
-    "brackets",
-    "color",
-    "nestica",
-    "guides",
-    "indentation",
-    "nested",
-    "parentheses",
-    "curly braces",
-    "square brackets"
-  ],
-  "devDependencies": {
-    "@types/node": "^22.19.18",
-    "@types/vscode": "^1.90.0",
-    "@vscode/vsce": "^3.9.1",
-    "typescript": "^5.8.3"
-  }
 }

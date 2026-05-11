@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3 - 10/05/2026
+
+- Fixed guides visualization for empty lines by inserting indent strings, improving the accuracy of guide placement
+
 ## 0.2.2 - 10/05/2026
 
 - Refactoring to module structure for better maintainability
@@ -23,6 +27,7 @@
 - Initial release of Nestica, a VS Code extension for colorful bracket highlighting.
 
 ## Features
+
 - Colors both opening and closing brackets by nesting depth
 - Works in any files where these bracket characters are present
 - Colorful vertical guides for nested brackets

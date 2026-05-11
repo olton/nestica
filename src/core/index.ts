@@ -11,13 +11,13 @@ import {
 import { getConfiguredColors, getGuideSettings, isColorizationEnabled } from './config';
 import { clearAllRefreshTimers, clearDocumentRefresh, scheduleRefresh } from '../utils/scheduler';
 import { applyNesticaDecorations, createDecorationSets, disposeDecorationSets as disposeEditorDecorationSets } from './decorations';
-import { getOutputChannel, logToOutput, showOutputChannel } from './output';
+import { getOutputChannel, showOutputChannel, log } from './output';
 import { DecorationSets } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
     const outputChannel = getOutputChannel();
     context.subscriptions.push(outputChannel);
-    logToOutput('Nestica extension activated.');
+    log('Nestica extension activated.');
     if (context.extensionMode === vscode.ExtensionMode.Development) {
         showOutputChannel(true);
     }
@@ -92,7 +92,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }),
         vscode.commands.registerCommand('nestica.showOutput', () => {
             showOutputChannel();
-            logToOutput('Output channel opened via command.');
+            log('Output channel opened via command.');
         }),
         {
             dispose: () => {

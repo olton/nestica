@@ -3,6 +3,14 @@ import * as vscode from 'vscode';
 import { CLOSE_TO_OPEN, OPEN_TO_CLOSE } from '../core/constants';
 import { BracketMatch, StackEntry } from '../core/types';
 
+// Precompiled regex pattern for arrow function detection
+const ARROW_FUNCTION_PATTERN = /\)\s*(?:(?::[^{}()]*)\s*(?:=>)?|=>)\s*$/;
+const REGEX_EXPRESSION_PATTERN = /\/(?!\/|\*)(?:\\.|[^/\\\r\n])+\/[gimsuy]*/;
+
+/**
+ * Перевіряє, чи потрібно збільшити рівень вкладеності для фігурної дужки,
+ * якщо вона розташована після стрілкової функції.
+ */
 function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: number, parentCurlyLevel: number): boolean {
     if (parentCurlyLevel < 0) {
         return false;
@@ -11,23 +19,13 @@ function shouldOffsetCurlyBraceLevel(document: vscode.TextDocument, braceIndex: 
     const bracePos = document.positionAt(braceIndex);
     const linePrefix = document.lineAt(bracePos.line).text.slice(0, bracePos.character);
 
-    return /\)\s*(?:(?::[^{}()]*)\s*(?:=>)?|=>)\s*$/.test(linePrefix);
+    return ARROW_FUNCTION_PATTERN.test(linePrefix);
 }
 
-function isLikelyRegexLiteralStart(text: string, slashIndex: number): boolean {
-    let i = slashIndex - 1;
-
-    while (i >= 0 && /\s/.test(text[i])) {
-        i -= 1;
-    }
-
-    if (i < 0) {
-        return true;
-    }
-
-    return /[\(\[\{=,:;!&|?+\-*%^~<>]/.test(text[i]);
-}
-
+/**
+ * Аналізує пари дужок у документі та повертає список зівнішніх відповідностей.
+ * Враховує контекст: рядки, коментарі та регулярні вирази.
+ */
 export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch[] {
     const text = document.getText();
     const stack: StackEntry[] = [];
@@ -39,12 +37,12 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
     let inLineComment = false;
     let inBlockComment = false;
     let inRegexLiteral = false;
-    let inRegexCharClass = false;
     let isEscaped = false;
 
     for (let i = 0; i < text.length; i += 1) {
         const ch = text[i];
 
+        // Обробка коментарів
         if (inLineComment) {
             if (ch === '\n') {
                 inLineComment = false;
@@ -55,11 +53,12 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
         if (inBlockComment) {
             if (ch === '*' && text[i + 1] === '/') {
                 inBlockComment = false;
-                i += 1;
+                i++;
             }
             continue;
         }
 
+        // Обробка регулярних виразів
         if (inRegexLiteral) {
             if (isEscaped) {
                 isEscaped = false;
@@ -72,22 +71,48 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
             }
 
             if (ch === '[') {
-                inRegexCharClass = true;
+                // Всередині регулярного виразу можуть бути [] для character class
+                // Вони не впливають на рівень вкладеності, але потрібно відстежувати закриття
+                let bracketCount = 1;
+                i++;
+                while (i < text.length && bracketCount > 0) {
+                    const innerCh = text[i];
+                    if (isEscaped) {
+                        isEscaped = false;
+                        i++;
+                        continue;
+                    }
+
+                    if (innerCh === '\\') {
+                        isEscaped = true;
+                        i++;
+                        continue;
+                    }
+
+                    if (innerCh === '[') {
+                        bracketCount++;
+                    } else if (innerCh === ']') {
+                        bracketCount--;
+                    }
+                    i++;
+                }
+                if (i < text.length && bracketCount === 0) {
+                    // Закритий character class, продовжуємо з наступного символу
+                    continue;
+                }
+                // Якщо не знайшли закриття, просто виходимо з регулярного виразу
+                inRegexLiteral = false;
                 continue;
             }
 
-            if (ch === ']' && inRegexCharClass) {
-                inRegexCharClass = false;
-                continue;
-            }
-
-            if (ch === '/' && !inRegexCharClass) {
+            if (ch === '/') {
                 inRegexLiteral = false;
             }
 
             continue;
         }
 
+        // Обробка рядків
         if (inSingleQuotedString || inDoubleQuotedString || inTemplateString) {
             if (isEscaped) {
                 isEscaped = false;
@@ -117,24 +142,36 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
             continue;
         }
 
+        // Виявлення коментарів
         if (ch === '/' && text[i + 1] === '/') {
             inLineComment = true;
-            i += 1;
+            i++;
             continue;
         }
 
         if (ch === '/' && text[i + 1] === '*') {
             inBlockComment = true;
-            i += 1;
+            i++;
             continue;
         }
 
-        if (ch === '/' && text[i + 1] !== '/' && text[i + 1] !== '*' && isLikelyRegexLiteralStart(text, i)) {
-            inRegexLiteral = true;
-            inRegexCharClass = false;
-            continue;
+        // Виявлення регулярних виразів (перевірка, що це не операція ділення)
+        if (!inRegexLiteral && ch === '/' && text[i + 1] !== '/' && text[i + 1] !== '*') {
+            // Перевіряємо, чи є це початком регулярного виразу
+            let prevCharIndex = i - 1;
+            while (prevCharIndex >= 0 && /\s/.test(text[prevCharIndex])) {
+                prevCharIndex--;
+            }
+
+            // Якщо досягли початку або перед / є символи, що вказують на регулярний вираз
+            if (prevCharIndex < 0 || REGEX_EXPRESSION_PATTERN.test(text[prevCharIndex])) {
+                inRegexLiteral = true;
+                i++;
+                continue;
+            }
         }
 
+        // Виявлення рядків
         if (ch === "'") {
             inSingleQuotedString = true;
             continue;
@@ -150,7 +187,11 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
             continue;
         }
 
-        if (OPEN_TO_CLOSE[ch]) {
+        // Обробка відкриваючих дужок (ігноруємо в регулярних виразах)
+        if (inRegexLiteral) {
+            // Продовжуємо обробку регулярного виразу
+            // Nothing
+        } else if (OPEN_TO_CLOSE[ch]) {
             let level = stack.length;
 
             if (ch === '{') {
@@ -170,7 +211,8 @@ export function analyzeBracketPairs(document: vscode.TextDocument): BracketMatch
             continue;
         }
 
-        if (!CLOSE_TO_OPEN[ch]) {
+        // Обробка закриваючих дужок (ігноруємо в регулярних виразах)
+        if (inRegexLiteral || !CLOSE_TO_OPEN[ch]) {
             continue;
         }
 
