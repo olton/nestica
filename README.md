@@ -1,3 +1,9 @@
+<div align="center">
+
+![Nestica Logo](images/icon.png)
+
+</div>
+
 # Nestica
 
 Nestica is a Visual Studio Code extension that colors nested bracket pairs for better readability.
@@ -15,8 +21,21 @@ Nestica is a Visual Studio Code extension that colors nested bracket pairs for b
 ## Features
 
 - Colors both opening and closing brackets by nesting depth
+- Colorful vertical guides for nested brackets and tags
 - Works in any language where these bracket characters are present
 - Live updates while typing
+- Customizable colors and guide line styles
+- Option to choose predefined color palettes
+
+### Languages supported by Nestica:
+
+`typescript`, `javascript`, `css`, `scss`, `less`, `json`, `jsonc`, `xml`, `vue`, `html`, `jsx`, `tsx`, `c`,
+`cpp`, `csharp`, `java`, `go`, `rust`, `php`, `swift`, `kotlin`, `dart`, `objective-c`, `objective-cpp`,
+`scala`, `groovy`, `perl`, `ruby`, `shaderlab`, `glsl`, `hlsl`, `fsharp`, `vala`, `verilog`, `systemverilog`,
+`actionscript`, `coffeescript`, `qml`, `cuda-cpp`, `nim`, `crystal`, `v`, `solidity`, `elm`, `d`, `plaintext`.
+
+> [!NOTE]
+> If your language is not supported, you can create an issue to include it in the next release. You can also contribute by submitting a pull request with the necessary changes to support your language to the [Nestica on GitHub](https://github.com/olton/nestica)
 
 ## Development Setup
 

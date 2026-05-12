@@ -1,30 +1,9 @@
 import * as vscode from 'vscode';
 import { FeatureModule, GuideSettings, TagMatch } from '../core/types';
+import { colorWithOpacity } from '../utils/color';
 
 function toAttributeColor(color: string): string {
-    const normalized = color.trim();
-    const hex3 = /^#([\da-fA-F]{3})$/;
-    const hex6 = /^#([\da-fA-F]{6})$/;
-
-    const hex3Match = normalized.match(hex3);
-    if (hex3Match) {
-        const [r, g, b] = hex3Match[1].split('');
-        const rr = parseInt(r + r, 16);
-        const gg = parseInt(g + g, 16);
-        const bb = parseInt(b + b, 16);
-        return `rgba(${rr}, ${gg}, ${bb}, 0.75)`;
-    }
-
-    const hex6Match = normalized.match(hex6);
-    if (hex6Match) {
-        const hex = hex6Match[1];
-        const rr = parseInt(hex.slice(0, 2), 16);
-        const gg = parseInt(hex.slice(2, 4), 16);
-        const bb = parseInt(hex.slice(4, 6), 16);
-        return `rgba(${rr}, ${gg}, ${bb}, 0.75)`;
-    }
-
-    return normalized;
+    return colorWithOpacity(color, 0.75);
 }
 
 export function createTagsDecorationTypes(colors: string[], guideSettings: GuideSettings): vscode.TextEditorDecorationType[] {

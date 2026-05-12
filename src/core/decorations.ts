@@ -5,7 +5,7 @@ import { isLanguageSupported } from './config';
 import { normalizeTabSize } from '../utils/text-utils';
 import { FEATURE_REGISTRY } from '../features/registry';
 import { DecorationSets, GuideSettings } from './types';
-import { analyzeTagPairs } from '../utils/tag-analyzer';
+import { analyzeTagGuidePairs, analyzeTagPairs } from '../utils/tag-analyzer';
 
 export function createDecorationSets(colors: string[], guideSettings: GuideSettings): DecorationSets {
     const decorationSets = {} as DecorationSets;
@@ -50,9 +50,18 @@ export function applyNesticaDecorations(
     }
 
     const tabSize = normalizeTabSize(editor.options.tabSize);
+    const isMarkupLikeLanguage = ['html', 'xml', 'vue', 'jsx', 'tsx'].includes(editor.document.languageId);
 
     const bracketsMatches = analyzeBracketPairs(editor.document);
     const tagsMatches = analyzeTagPairs(editor.document);
+    const tagGuideMatches = isMarkupLikeLanguage ? analyzeTagGuidePairs(editor.document) : [];
+    const guideBracketMatches =
+        isMarkupLikeLanguage ?
+            bracketsMatches.filter((match) => {
+                const lineText = editor.document.lineAt(match.open.line).text;
+                return lineText[match.open.character] !== '<';
+            })
+        :   bracketsMatches;
 
     for (const feature of FEATURE_REGISTRY) {
         if (feature.id === 'xmlTags') {
@@ -70,10 +79,11 @@ export function applyNesticaDecorations(
                 editor.setDecorations(decorationTypes[i], applyRanges ? rangesByColor[i] : []);
             }
         } else {
+            const matches = feature.id === 'guides' ? [...guideBracketMatches, ...tagGuideMatches] : bracketsMatches;
             const decorationTypes = decorationSets[feature.id];
             const rangesByColor = feature.collectRanges({
                 document: editor.document,
-                matches: bracketsMatches,
+                matches,
                 colorCount: decorationTypes.length,
                 tabSize,
                 guideSettings,

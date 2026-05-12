@@ -2,7 +2,8 @@
 
 ## 0.3.0 - 12/05/2026
 
-- Added xml tags highlighting and guides support
+- Added xml tags highlighting and tag guide lines support
+- Added option to choose between custom colors and predefined palette for bracket and tags highlighting
 
 ## 0.2.4 - 10/05/2026
 

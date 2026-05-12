@@ -9,34 +9,7 @@ import {
     CONFIG_GUIDES_THICKNESS_KEY,
     CONFIG_SECTION,
 } from '../core/constants';
-import { normalizeGuideOpacity, normalizeGuideThickness } from '../utils/color';
-
-function colorWithOpacity(color: string, opacity: number): string {
-    const normalized = color.trim();
-
-    const hex3 = /^#([\da-fA-F]{3})$/;
-    const hex6 = /^#([\da-fA-F]{6})$/;
-
-    const hex3Match = normalized.match(hex3);
-    if (hex3Match) {
-        const [r, g, b] = hex3Match[1].split('');
-        const rr = parseInt(r + r, 16);
-        const gg = parseInt(g + g, 16);
-        const bb = parseInt(b + b, 16);
-        return `rgba(${rr}, ${gg}, ${bb}, ${opacity})`;
-    }
-
-    const hex6Match = normalized.match(hex6);
-    if (hex6Match) {
-        const hex = hex6Match[1];
-        const rr = parseInt(hex.slice(0, 2), 16);
-        const gg = parseInt(hex.slice(2, 4), 16);
-        const bb = parseInt(hex.slice(4, 6), 16);
-        return `rgba(${rr}, ${gg}, ${bb}, ${opacity})`;
-    }
-
-    return normalized;
-}
+import { colorWithOpacity, normalizeGuideOpacity, normalizeGuideThickness } from '../utils/color';
 
 export function createGuideDecorationTypes(colors: string[], guideSettings: GuideSettings): vscode.TextEditorDecorationType[] {
     if (!guideSettings.enabled) {
