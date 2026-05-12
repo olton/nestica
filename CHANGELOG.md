@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 - 12/05/2026
+
+- Added xml tags highlighting and guides support
+
 ## 0.2.4 - 10/05/2026
 
 - Remove indent fix for empty lines in guides, as it caused issues with unsaved file.

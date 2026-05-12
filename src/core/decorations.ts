@@ -5,6 +5,7 @@ import { isLanguageSupported } from './config';
 import { normalizeTabSize } from '../utils/text-utils';
 import { FEATURE_REGISTRY } from '../features/registry';
 import { DecorationSets, GuideSettings } from './types';
+import { analyzeTagPairs } from '../utils/tag-analyzer';
 
 export function createDecorationSets(colors: string[], guideSettings: GuideSettings): DecorationSets {
     const decorationSets = {} as DecorationSets;
@@ -50,21 +51,38 @@ export function applyNesticaDecorations(
 
     const tabSize = normalizeTabSize(editor.options.tabSize);
 
-    const matches = analyzeBracketPairs(editor.document);
+    const bracketsMatches = analyzeBracketPairs(editor.document);
+    const tagsMatches = analyzeTagPairs(editor.document);
 
     for (const feature of FEATURE_REGISTRY) {
-        const decorationTypes = decorationSets[feature.id];
-        const rangesByColor = feature.collectRanges({
-            document: editor.document,
-            matches,
-            colorCount: decorationTypes.length,
-            tabSize,
-            guideSettings,
-        });
-        const applyRanges = feature.shouldApply ? feature.shouldApply(guideSettings) : true;
+        if (feature.id === 'xmlTags') {
+            const decorationTypes = decorationSets[feature.id];
+            const rangesByColor = feature.collectRanges({
+                document: editor.document,
+                matches: tagsMatches,
+                colorCount: decorationTypes.length,
+                tabSize,
+                guideSettings,
+            });
+            const applyRanges = feature.shouldApply ? feature.shouldApply(guideSettings) : true;
 
-        for (let i = 0; i < decorationTypes.length; i += 1) {
-            editor.setDecorations(decorationTypes[i], applyRanges ? rangesByColor[i] : []);
+            for (let i = 0; i < decorationTypes.length; i += 1) {
+                editor.setDecorations(decorationTypes[i], applyRanges ? rangesByColor[i] : []);
+            }
+        } else {
+            const decorationTypes = decorationSets[feature.id];
+            const rangesByColor = feature.collectRanges({
+                document: editor.document,
+                matches: bracketsMatches,
+                colorCount: decorationTypes.length,
+                tabSize,
+                guideSettings,
+            });
+            const applyRanges = feature.shouldApply ? feature.shouldApply(guideSettings) : true;
+
+            for (let i = 0; i < decorationTypes.length; i += 1) {
+                editor.setDecorations(decorationTypes[i], applyRanges ? rangesByColor[i] : []);
+            }
         }
     }
 }

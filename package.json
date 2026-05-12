@@ -21,11 +21,6 @@
         "theme": "dark"
     },
     "activationEvents": [
-        "onLanguage:typescript",
-        "onLanguage:javascript",
-        "onLanguage:css",
-        "onLanguage:scss",
-        "onLanguage:less",
         "onStartupFinished"
     ],
     "main": "./dist/index.js",
@@ -51,20 +46,27 @@
                     "default": true,
                     "description": "Enable or disable nestica bracket colorization."
                 },
+                "nestica.palette": {
+                    "type": "string",
+                    "default": "default",
+                    "enum": [
+                        "default",
+                        "pastel",
+                        "neon",
+                        "earthy",
+                        "solarized",
+                        "monochrome",
+                        "candypop",
+                        "retro",
+                        "ocean",
+                        "galaxy"
+                    ],
+                    "description": "Built-in palette used for adaptive dark/light colors when nestica.colors is empty."
+                },
                 "nestica.colors": {
                     "type": "array",
-                    "default": [
-                        "#E5C07B",
-                        "#98C379",
-                        "#56B6C2",
-                        "#61AFEF",
-                        "#C678DD",
-                        "#BE5046",
-                        "#D19A66",
-                        "#AF1320",
-                        "#E06C75"
-                    ],
-                    "description": "List of colors used to paint bracket nesting levels.",
+                    "default": [],
+                    "description": "Optional custom colors for bracket nesting levels. Leave empty to use built-in adaptive palettes for dark/light themes.",
                     "items": {
                         "type": "string"
                     }

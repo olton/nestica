@@ -13,12 +13,16 @@ export function createBracketDecorationTypes(colors: string[]): vscode.TextEdito
 
 export function collectBracketRangesByColor(document: vscode.TextDocument, matches: BracketMatch[], colorCount: number): vscode.Range[][] {
     const bracketRangesByColor = Array.from({ length: colorCount }, () => [] as vscode.Range[]);
+    const isMarkupLanguage = document.languageId === 'html' || document.languageId === 'xml' || document.languageId === 'vue';
 
     for (const match of matches) {
         const colorIndex = match.level % colorCount;
 
         const openLineText = document.lineAt(match.open.line).text;
         const openChar = openLineText[match.open.character];
+        if (isMarkupLanguage && openChar === '<') {
+            continue;
+        }
         const hasClosingTagPrefix = openChar === '<' && openLineText[match.open.character + 1] === '/';
 
         if (hasClosingTagPrefix) {

@@ -3,6 +3,7 @@ import {
     CONFIG_BRACKETS_ENABLED_KEY,
     CONFIG_COLORS_KEY,
     CONFIG_LANGUAGES_KEY,
+    CONFIG_PALETTE_KEY,
     CONFIG_GUIDES_ENABLED_KEY,
     CONFIG_GUIDES_OPACITY_KEY,
     CONFIG_GUIDES_THICKNESS_KEY,
@@ -11,14 +12,13 @@ import {
 import { getConfiguredColors, getGuideSettings, isColorizationEnabled } from './config';
 import { clearAllRefreshTimers, clearDocumentRefresh, scheduleRefresh } from '../utils/scheduler';
 import { applyNesticaDecorations, createDecorationSets, disposeDecorationSets as disposeEditorDecorationSets } from './decorations';
-import { getOutputChannel, showOutputChannel, log } from './output';
+import { getOutputChannel, showOutputChannel } from './output';
 import { DecorationSets } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
-    const outputChannel = getOutputChannel();
-    context.subscriptions.push(outputChannel);
-    log('Nestica extension activated.');
     if (context.extensionMode === vscode.ExtensionMode.Development) {
+        const outputChannel = getOutputChannel();
+        context.subscriptions.push(outputChannel);
         showOutputChannel(true);
     }
 
@@ -65,28 +65,47 @@ export function activate(context: vscode.ExtensionContext): void {
             clearDocumentRefresh(doc);
         }),
 
+        vscode.window.onDidChangeActiveColorTheme((theme) => {
+            replaceDecorationSets();
+
+            for (const editor of vscode.window.visibleTextEditors) {
+                applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
+            }
+        }),
+
         vscode.workspace.onDidChangeConfiguration((event) => {
             const affectsEnabled = event.affectsConfiguration(CONFIG_BRACKETS_ENABLED_KEY);
             const affectsColors = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_COLORS_KEY}`);
+            const affectsPalette = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_PALETTE_KEY}`);
             const affectsLanguages = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_LANGUAGES_KEY}`);
             const affectsGuideEnabled = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_ENABLED_KEY}`);
             const affectsGuideThickness = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_THICKNESS_KEY}`);
             const affectsGuideOpacity = event.affectsConfiguration(`${CONFIG_SECTION}.${CONFIG_GUIDES_OPACITY_KEY}`);
+            const affectsWorkbenchTheme = event.affectsConfiguration('workbench.colorTheme');
 
             if (
                 !affectsEnabled &&
                 !affectsColors &&
+                !affectsPalette &&
                 !affectsLanguages &&
                 !affectsGuideEnabled &&
                 !affectsGuideThickness &&
-                !affectsGuideOpacity
+                !affectsGuideOpacity &&
+                !affectsWorkbenchTheme
             ) {
                 return;
             }
 
             colorizationEnabled = isColorizationEnabled();
 
-            if (affectsColors || affectsGuideEnabled || affectsGuideThickness || affectsGuideOpacity) {
+            if (
+                affectsColors ||
+                affectsPalette ||
+                affectsGuideEnabled ||
+                affectsGuideThickness ||
+                affectsGuideOpacity ||
+                affectsWorkbenchTheme
+            ) {
                 replaceDecorationSets();
             }
 
@@ -100,10 +119,6 @@ export function activate(context: vscode.ExtensionContext): void {
             if (editor) {
                 applyNesticaDecorations(editor, decorationSets, guideSettings, colorizationEnabled);
             }
-        }),
-        vscode.commands.registerCommand('nestica.showOutput', () => {
-            showOutputChannel();
-            log('Output channel opened via command.');
         }),
         {
             dispose: () => {
