@@ -115,8 +115,8 @@
     "square brackets"
   ],
   "devDependencies": {
-    "@types/node": "^25.7.0",
-    "@types/vscode": "^1.118.0",
+    "@types/node": "^25.8.0",
+    "@types/vscode": "^1.90.0",
     "@vscode/vsce": "^3.9.1",
     "typescript": "^6.0.3"
   }
