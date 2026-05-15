@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 - 15/05/2026
+
+- Added json keys highlighting support
+
 ## 0.3.0 - 12/05/2026
 
 - Added xml tags highlighting and tag guide lines support
