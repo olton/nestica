@@ -11,6 +11,7 @@ import {
 import { getGuideSettings } from '../features/guides';
 import { PALETTES } from '../palettes';
 
+// TODO: Remove legacy palette support in future patch use colors_default.ts instead
 const LEGACY_DARK_DEFAULTS = ['#E5C07B', '#98C379', '#56B6C2', '#61AFEF', '#C678DD', '#BE5046', '#D19A66', '#AF1320', '#E06C75'];
 
 function isSamePalette(left: string[], right: string[]): boolean {
